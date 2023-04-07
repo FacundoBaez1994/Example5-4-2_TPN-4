@@ -13,6 +13,10 @@
 #include "gas_sensor.h"
 #include "event_log.h"
 
+#include <string.h>
+#include "string.h"
+#include <iostream>
+
 //=====[Declaration of private defines]========================================
 
 //=====[Declaration of private data types]=====================================
@@ -22,6 +26,16 @@ typedef enum{
     PC_SERIAL_GET_CODE,
     PC_SERIAL_SAVE_NEW_CODE,
 } pcSerialComMode_t;
+
+typedef enum{
+    NOT_BEING_UNDER_CONFIG,
+    YEAR_UNDER_CONFIG,
+    MONTH_UNDER_CONFIG,
+    DAY_UNDER_CONFIG,
+    HOUR_UNDER_CONFIG,
+    MINUTES_UNDER_CONFIG,
+    SECONDS_UNDER_CONFIG
+} dateAndTimeStatus_t; //ANTIBLOQUEO
 
 //=====[Declaration and initialization of public global objects]===============
 
@@ -35,6 +49,7 @@ char codeSequenceFromPcSerialCom[CODE_NUMBER_OF_KEYS];
 
 //=====[Declaration and initialization of private global variables]============
 
+static dateAndTimeStatus_t DateAndTimeStatus = NOT_BEING_UNDER_CONFIG; //ANTIBLOQUEO
 static pcSerialComMode_t pcSerialComMode = PC_SERIAL_COMMANDS;
 static bool codeComplete = false;
 static int numberOfCodeChars = 0;
@@ -83,6 +98,10 @@ void pcSerialComStringWrite( const char* str )
 
 void pcSerialComUpdate()
 {
+    if (DateAndTimeStatus != NOT_BEING_UNDER_CONFIG) {  //ANTIBLOQUEO
+        commandSetDateAndTime();
+        return;
+    }
     char receivedChar = pcSerialComCharRead();
     if( receivedChar != '\0' ) {
         switch ( pcSerialComMode ) {
@@ -163,7 +182,10 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case '5': commandEnterNewCode(); break;
         case 'c': case 'C': commandShowCurrentTemperatureInCelsius(); break;
         case 'f': case 'F': commandShowCurrentTemperatureInFahrenheit(); break;
-        case 's': case 'S': commandSetDateAndTime(); break;
+        case 's': case 'S':
+            DateAndTimeStatus = YEAR_UNDER_CONFIG; //ANTIBLOQUEO
+            commandSetDateAndTime(); 
+            break;
         case 't': case 'T': commandShowDateAndTime(); break;
         case 'e': case 'E': commandShowStoredEvents(); break;
         default: availableCommands(); break;
@@ -253,13 +275,54 @@ static void commandShowCurrentTemperatureInFahrenheit()
 
 static void commandSetDateAndTime()
 {
-    char year[5] = "";
-    char month[3] = "";
-    char day[3] = "";
-    char hour[3] = "";
-    char minute[3] = "";
-    char second[3] = "";
-    
+    // ANTIBLOQUEANTE SON STATIC AHORA LOS STRINGS
+    static char year[5] = "";
+    static char month[3] = "";
+    static char day[3] = "";
+    static char hour[3] = "";
+    static char minute[3] = "";
+    static char second[3] = "";
+    static int stringIndex = 0;
+    char charReaded; // ANTIBLOQUEANTE
+ 
+    // ANTIBLOQUEANTE
+    switch ( DateAndTimeStatus ) {
+            case YEAR_UNDER_CONFIG:
+            charReaded =  pcSerialComCharRead();
+            if (charReaded != '\0'){
+                strcat(year, charReaded);
+                stringIndex ++;
+            }
+            
+            break;
+
+            case MONTH_UNDER_CONFIG:
+              
+            break;
+
+            case DAY_UNDER_CONFIG:
+              
+            break;
+
+            case HOUR_UNDER_CONFIG:
+              
+            break;
+
+            case MINUTES_UNDER_CONFIG:
+              
+            break;
+
+            case SECONDS_UNDER_CONFIG:
+              
+            break;
+            
+            default:
+                DateAndTimeStatus = NOT_BEING_UNDER_CONFIG;
+            break;
+        }
+    /*
+    // CODIGO VIEJO
+
     pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
     pcSerialComStringRead( year, 4);
     pcSerialComStringWrite("\r\n");
@@ -288,6 +351,7 @@ static void commandSetDateAndTime()
 
     dateAndTimeWrite( atoi(year), atoi(month), atoi(day), 
         atoi(hour), atoi(minute), atoi(second) );
+    */
 }
 
 static void commandShowDateAndTime()
