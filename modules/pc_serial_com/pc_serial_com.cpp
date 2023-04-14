@@ -291,6 +291,7 @@ static void commandSetDateAndTime()
     static char minute[3] = "";
     static char second[3] = "";
     static int stringIndex = 0;
+    static bool firstEntry = true;
     char charRead  = '\0'; // ANTIBLOQUEANTE
  
     //// // // //  ANTIBLOQUEANTE // // // // // // // // 
@@ -298,8 +299,12 @@ static void commandSetDateAndTime()
     switch ( DateAndTimeStatus ) {
             case YEAR_UNDER_CONFIG:
             if (stringIndex == 0) {
+                if (firstEntry == true) {
                 pcSerialComStringWrite("\r\n");
                 pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
+                firstEntry = false;
+                }
+
             }
             charRead =  pcSerialComCharRead();
             if (charRead != '\0') {
@@ -309,14 +314,19 @@ static void commandSetDateAndTime()
             if (stringIndex > YEAR_STRING_LONG){
                 stringIndex = 0;
                 DateAndTimeStatus = MONTH_UNDER_CONFIG;
+                year [YEAR_STRING_LONG - 1] = '\0';
+                firstEntry = true;
             }        
             break;
 
             case MONTH_UNDER_CONFIG:
-            if (stringIndex == 0) {
-                pcSerialComStringWrite("\r\n");
-                pcSerialComStringWrite("Type two digits for the current month (01-12): ");
-            }            
+           if (stringIndex == 0) {
+             if (firstEntry == true) {   
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite("Type two digits for the current month (01-12): ");
+                    firstEntry = false;
+                } 
+             }         
             charRead =  pcSerialComCharRead();
             if (charRead != '\0'){
                 month [stringIndex] = charRead; 
@@ -325,13 +335,18 @@ static void commandSetDateAndTime()
             if (stringIndex > MONTH_STRING_LONG){
                 stringIndex = 0;
                 DateAndTimeStatus = DAY_UNDER_CONFIG;
+                month [MONTH_STRING_LONG - 1] = '\0';
+                firstEntry = true;
             }  
             break;
 
             case DAY_UNDER_CONFIG:
             if (stringIndex == 0) {
-                pcSerialComStringWrite("\r\n");
-                pcSerialComStringWrite("Type two digits for the current day (01-31): ");
+                if (firstEntry == true) { 
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite("Type two digits for the current day (01-31): ");
+                    firstEntry = false;
+                    }
             }
             charRead =  pcSerialComCharRead();
             if (charRead != '\0'){
@@ -341,28 +356,38 @@ static void commandSetDateAndTime()
             if (stringIndex > DAY_STRING_LONG){
                 stringIndex = 0;
                 DateAndTimeStatus = HOUR_UNDER_CONFIG;
+                day [DAY_STRING_LONG - 1] = '\0';
+                firstEntry = true;
             } 
             break;
             case HOUR_UNDER_CONFIG:
             if (stringIndex == 0) {
-                pcSerialComStringWrite("\r\n");
-                pcSerialComStringWrite("Type two digits for the current hour (00-23): ");
+                if (firstEntry == true) { 
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite("Type two digits for the current hour (00-23): ");
+                    firstEntry = false;
+                }
             }
             charRead =  pcSerialComCharRead();
             if (charRead != '\0'){
                 hour [stringIndex] = charRead; 
                 stringIndex ++;
+                hour [HOUR_STRING_LONG - 1] = '\0';
             }
             if (stringIndex > HOUR_STRING_LONG){
                 stringIndex = 0;
                 DateAndTimeStatus = MINUTES_UNDER_CONFIG;
+                firstEntry = true;
             }
             break;
 
             case MINUTES_UNDER_CONFIG:
             if (stringIndex == 0) {
-                pcSerialComStringWrite("\r\n");
-                pcSerialComStringWrite("Type two digits for the current minutes (00-59): ");
+                 if (firstEntry == true) { 
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite("Type two digits for the current minutes (00-59): ");
+                    firstEntry = false;
+                 }
             }
             charRead =  pcSerialComCharRead();
             if (charRead != '\0'){
@@ -372,13 +397,18 @@ static void commandSetDateAndTime()
             if (stringIndex > MINUTE_STRING_LONG){
                 stringIndex = 0;
                 DateAndTimeStatus = SECONDS_UNDER_CONFIG;
+                minute [MINUTE_STRING_LONG - 1] = '\0';
+                firstEntry = true;
             }              
             break;
 
             case SECONDS_UNDER_CONFIG:
             if (stringIndex == 0) {
+                 if (firstEntry == true) { 
                 pcSerialComStringWrite("\r\n");
                 pcSerialComStringWrite("Type two digits for the current hour (00-23): ");
+                 firstEntry = false;
+                }
             }
             charRead =  pcSerialComCharRead();
             if (charRead != '\0'){
@@ -386,10 +416,12 @@ static void commandSetDateAndTime()
                 stringIndex ++;
             }
             if (stringIndex > SECOND_STRING_LONG){
+                second [SECOND_STRING_LONG - 1] = '\0';
                 stringIndex = 0;
                 dateAndTimeWrite( atoi(year), atoi(month), atoi(day), 
                 atoi(hour), atoi(minute), atoi(second) );
                 DateAndTimeStatus = NOT_BEING_UNDER_CONFIG;
+                 firstEntry = true;
             }              
             break;
             
