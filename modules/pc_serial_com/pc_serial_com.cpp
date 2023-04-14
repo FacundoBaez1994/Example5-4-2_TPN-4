@@ -311,7 +311,7 @@ static void commandSetDateAndTime()
                 year [stringIndex] = charRead; 
                 stringIndex ++;
             }
-            if (stringIndex > YEAR_STRING_LONG){
+            if (stringIndex >= YEAR_STRING_LONG - 1 ){
                 stringIndex = 0;
                 DateAndTimeStatus = MONTH_UNDER_CONFIG;
                 year [YEAR_STRING_LONG - 1] = '\0';
@@ -332,7 +332,7 @@ static void commandSetDateAndTime()
                 month [stringIndex] = charRead; 
                 stringIndex ++;
             }
-            if (stringIndex > MONTH_STRING_LONG){
+            if (stringIndex >= MONTH_STRING_LONG - 1){
                 stringIndex = 0;
                 DateAndTimeStatus = DAY_UNDER_CONFIG;
                 month [MONTH_STRING_LONG - 1] = '\0';
@@ -353,7 +353,7 @@ static void commandSetDateAndTime()
                 day [stringIndex] = charRead; 
                 stringIndex ++;
             }
-            if (stringIndex > DAY_STRING_LONG){
+            if (stringIndex >= DAY_STRING_LONG - 1){
                 stringIndex = 0;
                 DateAndTimeStatus = HOUR_UNDER_CONFIG;
                 day [DAY_STRING_LONG - 1] = '\0';
@@ -374,7 +374,7 @@ static void commandSetDateAndTime()
                 stringIndex ++;
                 hour [HOUR_STRING_LONG - 1] = '\0';
             }
-            if (stringIndex > HOUR_STRING_LONG){
+            if (stringIndex >= HOUR_STRING_LONG - 1){
                 stringIndex = 0;
                 DateAndTimeStatus = MINUTES_UNDER_CONFIG;
                 firstEntry = true;
@@ -394,7 +394,7 @@ static void commandSetDateAndTime()
                 minute [stringIndex] = charRead; 
                 stringIndex ++;
             }
-            if (stringIndex > MINUTE_STRING_LONG){
+            if (stringIndex >= MINUTE_STRING_LONG - 1){
                 stringIndex = 0;
                 DateAndTimeStatus = SECONDS_UNDER_CONFIG;
                 minute [MINUTE_STRING_LONG - 1] = '\0';
@@ -415,7 +415,7 @@ static void commandSetDateAndTime()
                 second [stringIndex] = charRead; 
                 stringIndex ++;
             }
-            if (stringIndex > SECOND_STRING_LONG){
+            if (stringIndex >= SECOND_STRING_LONG - 1){
                 second [SECOND_STRING_LONG - 1] = '\0';
                 stringIndex = 0;
                 dateAndTimeWrite( atoi(year), atoi(month), atoi(day), 
